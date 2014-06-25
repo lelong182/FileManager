@@ -95,6 +95,11 @@
             e.stopPropagation();
         });
 
+        $(".tree a").tooltip();
+        $(document).ajaxComplete(function() {
+            $(".tree a").tooltip();
+        });
+
         $(".tree").on("click", "a", function() {
             $('#rename-folder').addClass('hide');
             $('#trash').addClass('hide');

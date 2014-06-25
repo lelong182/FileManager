@@ -99,7 +99,7 @@ class Filemanager extends MX_Controller {
         foreach ($list as $key => $val) {
             if ($val['parent_id'] == $parent_id) {
                 unset($list[$key]);
-                $str .= '<li><span><i class="glyphicon glyphicon-folder-open"></i> <a href="#" data-id="' . $val['folder_id'] . '">' . $val['folder_name'] . '</a></span>';
+                $str .= '<li><span><i class="glyphicon glyphicon-folder-open"></i> <a data-placement="right" title="' . $val['slug'] . '" href="#" data-id="' . $val['folder_id'] . '">' . $val['folder_name'] . '</a></span>';
                 $str .= '<ul>';
                 $this->render_list_folder($list, $val['folder_id'], $str);
                 $str .= '</ul>';
@@ -116,6 +116,13 @@ class Filemanager extends MX_Controller {
         if ($parent_id != 0) {
             $this->render_path_folder($parent_id, $str);
         }
+    }
+
+    function get_path_folder($folder_id) {
+        $this->render_path_folder($folder_id, $str);
+        $arr = array_filter(explode('/', $str));
+        array_pop($arr);
+        echo 'root/' . implode('/', $arr);
     }
 
     function get_list_file() {
@@ -153,14 +160,6 @@ class Filemanager extends MX_Controller {
         $tmp = array_merge($arr, $tmp);
         foreach ($arr as $value) {
             $this->get_list_children_id($value['folder_id'], $tmp);
-        }
-    }
-
-    function test() {
-        $kq = array();
-        $this->get_list_children_id(2, $kq);
-        foreach ($kq as $value) {
-            echo $value['folder_id'] . '<br />';
         }
     }
 

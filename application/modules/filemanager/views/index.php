@@ -34,7 +34,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="modal fade" id="rename-folder-modal" role="dialog" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
