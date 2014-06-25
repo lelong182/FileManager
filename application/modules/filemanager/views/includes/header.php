@@ -34,7 +34,7 @@
 
     <body>
         <header>
-            <a href="<?= site_url('filemanager') ?>" class="btn <?= ($current_nav == 'local') ? 'btn-primary' : 'btn-info' ?>">Local</a>
-            <a href="<?= site_url('filemanager/drive') ?>" class="btn <?= ($current_nav == 'drive') ? 'btn-primary' : 'btn-info' ?>">Google Drive</a>
+            <a href="<?= site_url('filemanager') ?>" class="btn <?= ($current_nav == 'local') ? 'btn-primary' : 'btn-info' ?> btn-sm">Local</a>
+            <a href="<?= site_url('filemanager/drive') ?>" class="btn <?= ($current_nav == 'drive') ? 'btn-primary' : 'btn-info' ?> btn-sm">Google Drive</a>
         </header>
         <section id="main" class="clearfix">

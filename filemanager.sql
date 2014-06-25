@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Jun 25, 2014 at 07:17 AM
+-- Generation Time: Jun 25, 2014 at 12:45 PM
 -- Server version: 5.5.32-MariaDB-log
 -- PHP Version: 5.3.27
 
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS `ci_sessions` (
 --
 
 INSERT INTO `ci_sessions` (`session_id`, `ip_address`, `user_agent`, `last_activity`, `user_data`) VALUES
-('54ec25b4fc9956360358240a7483a562', '127.0.0.1', 'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:30.0) Gecko/20100101 Firefox/30.0', 1403665830, '');
+('0b401aea1e1c9e75a399bb501275ac38', '127.0.0.1', 'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:30.0) Gecko/20100101 Firefox/30.0', 1403685906, '');
 
 -- --------------------------------------------------------
 
@@ -58,35 +58,21 @@ CREATE TABLE IF NOT EXISTS `folder` (
   `updated_date` datetime NOT NULL,
   `is_trash` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`folder_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=23 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=22 ;
 
 --
 -- Dumping data for table `folder`
 --
 
 INSERT INTO `folder` (`folder_id`, `folder_name`, `slug`, `parent_id`, `created_date`, `updated_date`, `is_trash`) VALUES
-(1, 'folder1', 'folder1', 0, '2014-06-24 03:38:28', '0000-00-00 00:00:00', 0),
-(2, 'folder2', 'folder2', 1, '2014-06-24 03:38:58', '0000-00-00 00:00:00', 0),
-(3, 'folder3', 'folder3', 1, '2014-06-24 03:39:48', '0000-00-00 00:00:00', 0),
-(4, 'folder4', 'folder4', 1, '2014-06-23 18:42:36', '0000-00-00 00:00:00', 0),
-(5, 'Hình ảnh', 'hinh-anh', 0, '2014-06-23 18:43:11', '0000-00-00 00:00:00', 0),
-(6, 'Hình ảnh 2', 'hinh-anh-2', 5, '2014-06-23 18:49:39', '0000-00-00 00:00:00', 0),
-(7, 'Hình ảnh 3', 'hinh-anh-3', 5, '2014-06-23 18:51:13', '0000-00-00 00:00:00', 0),
-(8, 'folder11', 'folder11', 2, '2014-06-23 19:11:12', '0000-00-00 00:00:00', 0),
-(9, 'scc', 'scc', 8, '2014-06-23 19:32:47', '0000-00-00 00:00:00', 0),
-(10, 'test', 'test', 8, '2014-06-23 20:35:04', '0000-00-00 00:00:00', 0),
-(11, 'test2', 'test2', 8, '2014-06-23 20:35:17', '0000-00-00 00:00:00', 0),
-(12, 'test33', 'test33', 3, '2014-06-24 08:40:17', '0000-00-00 00:00:00', 0),
-(13, 'asdasda', 'asdasda', 3, '2014-06-24 08:40:20', '0000-00-00 00:00:00', 0),
-(14, 'Du lịch', 'du-lich', 0, '2014-06-25 02:55:26', '0000-00-00 00:00:00', 0),
-(15, 'Du lịch 1', 'du-lich-1', 14, '2014-06-25 02:56:20', '0000-00-00 00:00:00', 0),
-(16, 'Album 1', 'album-1', 14, '2014-06-25 03:08:52', '0000-00-00 00:00:00', 0),
-(17, 'testtest', 'testtest', 0, '2014-06-25 03:09:23', '0000-00-00 00:00:00', 0),
-(18, 'Biển', 'bien', 0, '2014-06-25 03:10:44', '0000-00-00 00:00:00', 0),
-(19, 'Album 11', 'album-11', 17, '2014-06-25 03:11:33', '0000-00-00 00:00:00', 0),
-(20, 'Hình ảnh 33', 'hinh-anh-33', 7, '2014-06-25 03:12:30', '0000-00-00 00:00:00', 0),
-(21, 'poo', 'poo', 0, '2014-06-25 03:13:29', '0000-00-00 00:00:00', 0),
-(22, 'bar', 'bar', 0, '2014-06-25 03:14:45', '0000-00-00 00:00:00', 0);
+(1, 'Album 1', 'album-1', 0, '2014-06-25 06:34:59', '0000-00-00 00:00:00', 0),
+(2, 'Album 2', 'album-2', 0, '2014-06-25 06:35:13', '0000-00-00 00:00:00', 0),
+(3, 'Album 3', 'album-3', 0, '2014-06-25 06:58:05', '0000-00-00 00:00:00', 0),
+(4, 'Album 21', 'album-21', 2, '2014-06-25 06:55:17', '0000-00-00 00:00:00', 0),
+(5, 'Album 22', 'album-22', 2, '2014-06-25 06:35:47', '0000-00-00 00:00:00', 0),
+(6, 'Album 211', 'album-211', 4, '2014-06-25 06:36:01', '0000-00-00 00:00:00', 0),
+(7, 'Album 212', 'album-212', 4, '2014-06-25 06:36:14', '0000-00-00 00:00:00', 0),
+(8, 'Album 11', 'album-11', 1, '2014-06-25 06:36:41', '0000-00-00 00:00:00', 0);
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

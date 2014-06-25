@@ -1,39 +1,83 @@
 (function($) {
     $(document).ready(function() {
+
+        function render_tree() {
+            $('.tree').html('<center><img src="http://localhost/filemanager/assets/images/loading.gif" alt="loading" /></center>');
+            $.get('filemanager/render_tree', function(data) {
+                $('.tree').html(data);
+                $('.tree li:has(ul)').addClass('parent_li');
+                $('.tree li.parent_li > span').parent('li.parent_li').find(' > ul > li').hide();
+            });
+        }
+
+        $(window).bind('beforeunload', function() {
+            $('#create-folder-form').find('input[name="parent_id"]').val(0);
+        });
+
         $(".taskbar").on("click", "#create-folder", function() {
-            $('#create-folder-form span.message').html("");
+            $('#create-folder-form div.message').html("");
             $('#create-folder-form').trigger("reset");
             $('#create-folder-form').parsley().reset();
         });
-        $("#create-folder-form").on("change", "#folder_name", function() {
-            $('#create-folder-form div.message').html("");
-            $('#create-folder-form div.message').removeClass('filled');
-            $('#create-folder-form #folder_name').removeClass('parsley-error');
+
+        $(".taskbar").on("click", "#rename-folder", function() {
+            $('#rename-folder-form div.message').html("");
+            $('#rename-folder-form').parsley().reset();
         });
-        $(".modal").on("submit", "#create-folder-form", function() {
+
+        $(".taskbar").on("click", "#trash", function() {
+            $.get('filemanager/trash/' + $(this).attr('data-id'), function(data) {
+                render_tree();
+                bootbox.alert(data);
+            });
+        });
+
+        $(".taskbar").on("click", "#delete-folder", function() {
+            var delete_btn = $(this);
+            bootbox.confirm("Are you sure?", function(result) {
+                if (result) {
+                    var id = delete_btn.attr('data-id');
+                    var params = 'id=' + id;
+                    var data_toke_name = $('.tree').attr('data-token-name');
+                    var data_toke_value = $('.tree').attr('data-token-value');
+                    params += '&' + data_toke_name + '=' + data_toke_value;
+                    $.ajax({
+                        type: "POST",
+                        url: 'filemanager/delete',
+                        data: params,
+                        success: function(data) {
+                            render_tree();
+                            bootbox.alert(data);
+                        }
+                    });
+                } else {
+                    console.log(0);
+                }
+            });
+        });
+
+        $(".taskbar").on("change", "#folder_name", function() {
+            $('.folder-form div.message').html("");
+            $('.folder-form div.message').removeClass('filled');
+            $('.folder-form #folder_name').removeClass('parsley-error');
+        });
+
+        $(".modal").on("submit", ".folder-form", function() {
             $.ajax({
                 type: "POST",
                 url: $(this).attr('action'),
                 data: $(this).serialize(),
+                dataType: 'json',
                 success: function(data) {
-                    if (data === 'Directory is exist.') {
-                        $('#create-folder-form div.message').html('<h5>' + data + '</h5>');
-                        $('#create-folder-form div.message').addClass('filled');
-                        $('#create-folder-form #folder_name').addClass('parsley-error');
+                    if (data.status === 'ERROR') {
+                        $('.folder-form div.message').html('<h5>' + data.message + '</h5>');
+                        $('.folder-form div.message').addClass('filled');
+                        $('.folder-form #folder_name').addClass('parsley-error');
                     } else {
-                        $('.tree').html('<center><img src="assets/images/loading.gif" alt="loading" /></center>');
                         $('.modal').modal('hide');
-                        $.get('filemanager/render_tree', function(data) {
-                            $('.tree').html(data);
-                            $('.tree li:has(ul)').addClass('parent_li');
-                            $('.tree li.parent_li > span').parent('li.parent_li').find(' > ul > li').hide();
-                        });
-                        bootbox.alert(data);
+                        render_tree()
+                        bootbox.alert(data.message);
                     }
-                },
-                error: function(data) {
-                    $('.modal').modal('hide');
-                    bootbox.alert(data);
                 }
             });
             return false;
@@ -52,7 +96,10 @@
         });
 
         $(".tree").on("click", "a", function() {
-            $('.main-content').html('<center><img src="assets/images/loading.gif" alt="loading" /></center>');
+            $('#rename-folder').addClass('hide');
+            $('#trash').addClass('hide');
+            $('#delete-folder').addClass('hide');
+            $('.main-content').html('<center><img src="http://localhost/filemanager/assets/images/loading.gif" alt="loading" /></center>');
             var url = 'filemanager/get_list_file';
             var id = $(this).attr('data-id');
             var params = 'id=' + id;
@@ -64,8 +111,15 @@
                 url: url,
                 data: params,
                 success: function(data) {
-                    $('#create-folder-modal').find('input[name="parent_id"]').val(id);
+                    $('#create-folder-form').find('input[name="parent_id"]').val(id);
+                    $('#rename-folder-form').find('input[name="folder_id"]').val(id);
+                    $('#rename-folder-form').find('input[name="folder_name"]').val(data);
                     $('.main-content').html(data);
+                    $('#trash').attr('data-id', id);
+                    $('#delete-folder').attr('data-id', id);
+                    $('#rename-folder').removeClass('hide');
+                    $('#trash').removeClass('hide');
+                    $('#delete-folder').removeClass('hide');
                 }
             });
             return false;
