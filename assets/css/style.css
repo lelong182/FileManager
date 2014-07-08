@@ -24,6 +24,14 @@ header {
 #main {
     margin: 5px 0;
 }
+.file-toolbar {
+    border-bottom: 1px solid #ecf0f1;
+    padding: 5px;
+}
+.file-toolbar input[type="file"] {
+    display: inline;
+    width: 200px;
+}
 .taskbar {
     border-bottom: 1px solid #ecf0f1;
     padding: 5px;
@@ -154,4 +162,15 @@ textarea + .parsley-errors-list li:first-child {
     background:#eee;
     border:1px solid #94a0b4;
     color:#000
+}
+.table thead th:nth-child(1) {
+    width: 50%;
+}
+.table thead th:nth-child(2) {
+    width: 20%;
+}
+.table thead th:nth-child(3) {
+    width: 10%;
+}.table thead th:nth-child(4) {
+    width: 20%;
 }

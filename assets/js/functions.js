@@ -101,6 +101,7 @@
         });
 
         $(".tree").on("click", "a", function() {
+            $('.file-toolbar').addClass('hide');
             $('#rename-folder').addClass('hide');
             $('#trash').addClass('hide');
             $('#delete-folder').addClass('hide');
@@ -119,6 +120,8 @@
                     $('#create-folder-form').find('input[name="parent_id"]').val(id);
                     $('#rename-folder-form').find('input[name="folder_id"]').val(id);
                     $('#rename-folder-form').find('input[name="folder_name"]').val(data);
+                    $('#upload-file-form').find('input[name="folder_id"]').val(id);
+                    $('.file-toolbar').removeClass('hide');
                     $('.main-content').html(data);
                     $('#trash').attr('data-id', id);
                     $('#delete-folder').attr('data-id', id);

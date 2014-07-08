@@ -60,7 +60,16 @@
             </div>
         </div>
     </div>
-    <div class="main-content">
-        <h4>List files.</h4>
+    <div class="main">
+        <div class="file-toolbar hide">
+            <?php echo form_open_multipart('filemanager/upload', "id='upload-file-form' class='form-inline'"); ?>
+            <input type="hidden" name="folder_id" value="0" />
+            <input type="file" name="userfile[]" id="userfile" multiple>
+            <button class="btn btn-success btn-sm">Upload</button>
+            <?php echo form_close(); ?>
+        </div>
+        <div class="main-content">
+            <h4>Choose folder...</h4>
+        </div>
     </div>
 </div>

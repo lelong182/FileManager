@@ -5,9 +5,74 @@ if (!defined('BASEPATH'))
 
 class Filemanager extends MX_Controller {
 
+    var $url_img;
+    var $url_img_thumbs;
+
     function __construct() {
         parent::__construct();
         $this->load->model('folder_model', 'folder');
+        $this->load->model('file_model', 'file');
+    }
+
+    function upload() {
+        $folder_id = $this->input->post('folder_id');
+        $this->render_path_folder($folder_id, $str);
+        $path = $_SERVER["DOCUMENT_ROOT"] . "/filemanager/files/" . $str;
+        $path_thumb = $_SERVER["DOCUMENT_ROOT"] . "/filemanager/files/thumbs/" . $str;
+
+        $this->load->library('upload');
+        $config_upload['upload_path'] = $path;
+        $config_upload['allowed_types'] = 'doc|pdf|xlsx|ppt|jpg|jpeg|gif|png|xls|docx|pptx|txt';
+        $config_upload['max_size'] = '0';
+        $config_upload['overwrite'] = FALSE;
+        $this->upload->initialize($config_upload);
+
+        $config_image_lib['image_library'] = 'gd2';
+        $config_image_lib['create_thumb'] = TRUE;
+        $config_image_lib['maintain_ratio'] = TRUE;
+        $config_image_lib['width'] = 100;
+        $config_image_lib['height'] = 100;
+        $this->load->library('image_lib', $config_image_lib);
+
+        if ($this->upload->do_multi_upload("userfile")) {
+            $data = $this->upload->get_multi_upload_data();
+            foreach ($data as $value) {
+                if ($value['is_image']) {
+                    $size = $value['image_width'] . 'x' . $value['image_height'];
+                } else {
+                    $size = "";
+                }
+                $this->file->insert(array(
+                    'folder_id' => $folder_id,
+                    'file_name' => $value['file_name'],
+                    'raw_name' => $value['raw_name'],
+                    'file_type' => $value['file_type'],
+                    'file_ext' => $value['file_ext'],
+                    'size' => $size,
+                    'capacity' => $value['file_size'],
+                    'date_upload' => date('Y-m-d H:i:s'),
+                    'date_update' => date('Y-m-d H:i:s')
+                ));
+
+                $config_image_lib['source_image'] = $path . '/' . $value['file_name'];
+                $config_image_lib['new_image'] = $path_thumb . '/' . $value['file_name'];
+                $this->image_lib->initialize($config_image_lib);
+                if (!$this->image_lib->resize()) {
+                    echo $this->image_lib->display_errors();
+                    exit;
+                }
+            }
+            redirect('filemanager');
+        } else {
+            $this->index();
+        }
+    }
+
+    function imageResize($file_name) {
+        $config['source_image'] = $this->url_img . $file_name;
+        $config['new_image'] = $this->url_img_thumbs . $file_name;
+        $this->image_lib->initialize($config);
+        $this->image_lib->resize();
     }
 
     function index() {
@@ -28,11 +93,14 @@ class Filemanager extends MX_Controller {
         if ($parent_id != 0) {
             $this->render_path_folder($parent_id, $str);
             $path = $_SERVER["DOCUMENT_ROOT"] . "/filemanager/files/" . $str . $slug;
+            $path_thumb = $_SERVER["DOCUMENT_ROOT"] . "/filemanager/files/thumbs/" . $str . $slug;
         } else {
             $path = $_SERVER["DOCUMENT_ROOT"] . "/filemanager/files/" . $slug;
+            $path_thumb = $_SERVER["DOCUMENT_ROOT"] . "/filemanager/files/thumbs/" . $slug;
         }
         if (!is_dir($path)) {
             if (mkdir($path)) {
+                mkdir($path_thumb);
                 $this->folder->insert(array(
                     'folder_name' => $folder_name,
                     'slug' => $slug,
@@ -127,7 +195,19 @@ class Filemanager extends MX_Controller {
 
     function get_list_file() {
         $folder_id = $this->input->post('id');
-        echo $this->folder->get($folder_id)->folder_name;
+        $list_file = $this->file->get_many_by('folder_id', $folder_id);
+        if (isset($list_file[0])) {
+            $tmpl = array('table_open' => '<table class="table table-striped table-hover">');
+            $this->table->set_template($tmpl);
+            $this->table->set_heading('File name', 'File type', 'Size', 'Date updated');
+            foreach ($list_file as $value) {
+                $this->table->add_row($value->file_name, $value->file_type, $value->capacity . 'KB', date('H:i:s d-m-Y', strtotime($value->date_update)));
+            }
+            $this->table->set_footer('File name', 'File type', 'Size', 'Date updated');
+            echo $this->table->generate();
+        } else {
+            echo 'The folder is empty.';
+        }
     }
 
     function trash($folder_id) {
