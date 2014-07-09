@@ -75,9 +75,47 @@
                         $('.folder-form #folder_name').addClass('parsley-error');
                     } else {
                         $('.modal').modal('hide');
-                        render_tree()
+                        render_tree();
                         bootbox.alert(data.message);
                     }
+                }
+            });
+            return false;
+        });
+
+        $(".file-toolbar").on("submit", "#upload-file-form", function() {
+            var formData = new FormData(document.getElementById("upload-file-form"));
+            $('.file-toolbar .wrap-progress').removeClass('hide');
+            $.ajax({
+                xhr: function() {
+                    var xhr = new window.XMLHttpRequest();
+                    xhr.upload.addEventListener("progress", function(evt) {
+                        if (evt.lengthComputable) {
+                            var percentComplete = evt.loaded / evt.total;
+                            percentComplete = parseInt(percentComplete * 100);
+                            $('.file-toolbar .progress-bar').css('width', percentComplete + '%');
+                            if (percentComplete === 100) {
+                                $('.file-toolbar .wrap-progress').html('<div class=\"alert alert-dismissable alert-success\"><button type=\"button\" class=\"close\" data-dismiss=\"alert\">×</button><strong>Upload successfully!</strong></div>').hide().fadeIn('slow');
+                            }
+                        }
+                    }, false);
+                    return xhr;
+                },
+                type: "POST",
+                url: $(this).attr('action'),
+                processData: false,
+                contentType: false,
+                data: formData,
+                success: function() {
+                    $('.main-content').html('<center><img src="http://localhost/filemanager/assets/images/loading.gif" alt="loading" /></center>');
+                    var params = 'id=' + $("#upload-file-form").find('input[name="folder_id"]').val();
+                    var data_toke_name = $('.main-content').attr('data-token-name');
+                    var data_toke_value = $('.main-content').attr('data-token-value');
+                    params += '&' + data_toke_name + '=' + data_toke_value;
+                    $.post('filemanager/get_list_file', params, function(data) {
+                        $('.main-content').html(data);
+                        $('#upload-file-form').trigger("reset");
+                    });
                 }
             });
             return false;

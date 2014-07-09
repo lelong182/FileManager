@@ -67,8 +67,15 @@
             <input type="file" name="userfile[]" id="userfile" multiple>
             <button class="btn btn-success btn-sm">Upload</button>
             <?php echo form_close(); ?>
+            <br />
+            <div class="wrap-progress hide">
+                <div class="progress progress-striped active">
+                    <div class="progress-bar" style="width: 0%"></div>
+                </div> 
+            </div>
         </div>
-        <div class="main-content">
+
+        <div class="main-content" data-token-name="<?= $this->security->get_csrf_token_name(); ?>" data-token-value="<?= $this->security->get_csrf_hash(); ?>">
             <h4>Choose folder...</h4>
         </div>
     </div>

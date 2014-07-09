@@ -36,5 +36,6 @@
         <header>
             <a href="<?= site_url('filemanager') ?>" class="btn <?= ($current_nav == 'local') ? 'btn-primary' : 'btn-info' ?> btn-sm">Local</a>
             <a href="<?= site_url('filemanager/drive') ?>" class="btn <?= ($current_nav == 'drive') ? 'btn-primary' : 'btn-info' ?> btn-sm">Google Drive</a>
+            <a href="<?= site_url('filemanager/list_trash') ?>" class="btn <?= ($current_nav == 'list_trash') ? 'btn-primary' : 'btn-info' ?> btn-sm">List trash</a>
         </header>
         <section id="main" class="clearfix">

@@ -62,7 +62,7 @@ class Filemanager extends MX_Controller {
                     exit;
                 }
             }
-            redirect('filemanager');
+            print_r($data);
         } else {
             $this->index();
         }
@@ -199,11 +199,12 @@ class Filemanager extends MX_Controller {
         if (isset($list_file[0])) {
             $tmpl = array('table_open' => '<table class="table table-striped table-hover">');
             $this->table->set_template($tmpl);
-            $this->table->set_heading('File name', 'File type', 'Size', 'Date updated');
+            $this->table->set_heading('Num', 'File name', 'File type', 'Size', 'Date updated');
+            $count = 1;
             foreach ($list_file as $value) {
-                $this->table->add_row($value->file_name, $value->file_type, $value->capacity . 'KB', date('H:i:s d-m-Y', strtotime($value->date_update)));
+                $this->table->add_row($count++, $value->file_name, $value->file_type, $value->capacity . ' KB', date('H:i:s d-m-Y', strtotime($value->date_update)));
             }
-            $this->table->set_footer('File name', 'File type', 'Size', 'Date updated');
+            $this->table->set_footer('Num', 'File name', 'File type', 'Size', 'Date updated');
             echo $this->table->generate();
         } else {
             echo 'The folder is empty.';
@@ -271,6 +272,12 @@ class Filemanager extends MX_Controller {
     function drive() {
         $data['main_content'] = 'drive';
         $data['current_nav'] = 'drive';
+        $this->load->view('includes/template', $data);
+    }
+
+    function list_trash() {
+        $data['main_content'] = 'list_trash';
+        $data['current_nav'] = 'list_trash';
         $this->load->view('includes/template', $data);
     }
 
