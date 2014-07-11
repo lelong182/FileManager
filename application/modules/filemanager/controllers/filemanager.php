@@ -12,6 +12,13 @@ class Filemanager extends MX_Controller {
         parent::__construct();
         $this->load->model('folder_model', 'folder');
         $this->load->model('file_model', 'file');
+
+        $config_image_lib['image_library'] = 'gd2';
+        $config_image_lib['create_thumb'] = TRUE;
+        $config_image_lib['maintain_ratio'] = TRUE;
+        $config_image_lib['width'] = 100;
+        $config_image_lib['height'] = 100;
+        $this->load->library('image_lib', $config_image_lib);
     }
 
     function upload() {
@@ -27,18 +34,15 @@ class Filemanager extends MX_Controller {
         $config_upload['overwrite'] = FALSE;
         $this->upload->initialize($config_upload);
 
-        $config_image_lib['image_library'] = 'gd2';
-        $config_image_lib['create_thumb'] = TRUE;
-        $config_image_lib['maintain_ratio'] = TRUE;
-        $config_image_lib['width'] = 100;
-        $config_image_lib['height'] = 100;
-        $this->load->library('image_lib', $config_image_lib);
-
         if ($this->upload->do_multi_upload("userfile")) {
             $data = $this->upload->get_multi_upload_data();
             foreach ($data as $value) {
                 if ($value['is_image']) {
                     $size = $value['image_width'] . 'x' . $value['image_height'];
+                    $config_image_lib['source_image'] = $path . '/' . $value['file_name'];
+                    $config_image_lib['new_image'] = $path_thumb . '/' . $value['file_name'];
+                    $this->image_lib->initialize($config_image_lib);
+                    $this->image_lib->resize();
                 } else {
                     $size = "";
                 }
@@ -53,14 +57,6 @@ class Filemanager extends MX_Controller {
                     'date_upload' => date('Y-m-d H:i:s'),
                     'date_update' => date('Y-m-d H:i:s')
                 ));
-
-                $config_image_lib['source_image'] = $path . '/' . $value['file_name'];
-                $config_image_lib['new_image'] = $path_thumb . '/' . $value['file_name'];
-                $this->image_lib->initialize($config_image_lib);
-                if (!$this->image_lib->resize()) {
-                    echo $this->image_lib->display_errors();
-                    exit;
-                }
             }
             print_r($data);
         } else {
@@ -195,20 +191,102 @@ class Filemanager extends MX_Controller {
 
     function get_list_file() {
         $folder_id = $this->input->post('id');
+        $this->db->where('is_trash', 0);
         $list_file = $this->file->get_many_by('folder_id', $folder_id);
         if (isset($list_file[0])) {
             $tmpl = array('table_open' => '<table class="table table-striped table-hover">');
             $this->table->set_template($tmpl);
-            $this->table->set_heading('Num', 'File name', 'File type', 'Size', 'Date updated');
+            $this->table->set_heading('<input type="checkbox" />', 'No.', 'File name', 'File type', 'Size', 'Date updated');
             $count = 1;
+            $content = "";
+            $this->render_path_folder($folder_id, $str);
+            $path = base_url() . "files/" . $str;
             foreach ($list_file as $value) {
-                $this->table->add_row($count++, $value->file_name, $value->file_type, $value->capacity . ' KB', date('H:i:s d-m-Y', strtotime($value->date_update)));
+                $file_url = $path . $value->file_name;
+                if($value->size !== "") {
+                    $content = '<center><img class="img-responsive" src="' . $file_url . '" alt="img" /></center>';
+                } else {
+                    $content = $value->raw_name;
+                }
+                $this->table->add_row(
+                    '<input type="checkbox" />', 
+                    $count++, 
+                    '<a href="#" data-toggle="modal" data-target="#file-details-' . $value->file_id . '">' . $value->file_name . '</a>'
+                    . '<div class="modal fade" id="file-details-' . $value->file_id . '" role="dialog" aria-hidden="true">'
+                        . '<div class="modal-dialog modal-lg">'
+                            . '<div class="modal-content">'
+                                . '<div class="modal-header">'
+                                    . '<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>'
+                                    . '<h4 class="modal-title">' 
+                                        . '<a href="#" class="file_name" data-type="text" data-pk="' . $value->file_id . '" data-url="' . site_url('filemanager/rename_file') . '" data-title="File rename">'
+                                            . $value->raw_name
+                                        . '</a>'
+                                        . $value->file_ext
+                                    . '</h4>'
+                                . '</div>'
+                                . '<div class="modal-body">'
+                                    . $content
+                                . '</div>'
+                                . '<div class="modal-footer">'
+                                    . '<a href="' . site_url('filemanager/download_file/' . $value->file_id) . '" class="btn btn-info btn-sm">Download</a>'
+                                    . '<a href="' . site_url('filemanager/trash_file/' . $value->file_id) . '" class="btn btn-default btn-sm trash-file">Trash</a>'
+                                    . '<a href="' . site_url('filemanager/delete_file/' . $value->file_id) . '" class="btn btn-danger btn-sm delete-file">Delete</a>'
+                                    . '<button type="button" class="btn btn-warning btn-sm" data-dismiss="modal">Cancel</button>'
+                                . '</div>'
+                            . '</div>'
+                        . '</div>'
+                    . '</div>', 
+                    $value->file_type, 
+                    $value->capacity . ' bytes', 
+                    date('H:i:s d-m-Y', strtotime($value->date_update)
+                ));
             }
-            $this->table->set_footer('Num', 'File name', 'File type', 'Size', 'Date updated');
+            $this->table->set_footer('<input type="checkbox" />', 'No.', 'File name', 'File type', 'Size', 'Date updated');
             echo $this->table->generate();
         } else {
             echo 'The folder is empty.';
         }
+    }
+    
+    function rename_file() {
+        $id = $this->input->post('pk');
+        $value = $this->input->post('value');
+        $file = $this->file->get($id);
+        $folder_id = $file->folder_id;
+        $this->render_path_folder($folder_id, $str);
+        $path = $_SERVER["DOCUMENT_ROOT"] . "/filemanager/files/" . $str;
+        $path_thumb = $_SERVER["DOCUMENT_ROOT"] . "/filemanager/files/thumbs/" . $str;
+        $update_id = $this->file->update($id, array(
+            'raw_name' => $value,
+            'file_name' => $value . $file->file_ext
+        ));
+        if($update_id) {
+            rename($path . $file->file_name, $path . $value . $file->file_ext);
+            rename($path_thumb . $file->raw_name . '_thumb' . $file->file_ext, $path_thumb . $value . '_thumb' . $file->file_ext);
+        }
+    }
+    
+    function download_file($file_id) {
+        $file = $this->file->get($file_id);
+        $this->render_path_folder($file->folder_id, $str);
+        $data = file_get_contents($_SERVER["DOCUMENT_ROOT"] . "/filemanager/files/" . $str . $file->file_name);
+        $name = $file->file_name;
+        force_download($name, $data); 
+    }
+    
+    function delete_file($file_id) {
+        $file = $this->file->get($file_id);
+        $this->render_path_folder($file->folder_id, $str);
+        echo $_SERVER["DOCUMENT_ROOT"] . "/filemanager/files/" . $str . $file->file_name;
+        if(unlink($_SERVER["DOCUMENT_ROOT"] . "/filemanager/files/" . $str . $file->file_name)) {
+            $this->file->delete($file->file_id);
+        }
+    }
+    
+    function trash_file($file_id) {
+        $this->file->update($file_id, array(
+            'is_trash' => 1
+        ));
     }
 
     function trash($folder_id) {
@@ -270,6 +348,9 @@ class Filemanager extends MX_Controller {
     }
 
     function drive() {
+        $this->load->library('google');
+        echo $this->google->getLibraryVersion();
+
         $data['main_content'] = 'drive';
         $data['current_nav'] = 'drive';
         $this->load->view('includes/template', $data);

@@ -62,7 +62,7 @@
             $('.folder-form #folder_name').removeClass('parsley-error');
         });
 
-        $(".modal").on("submit", ".folder-form", function() {
+        $(".folder-modal").on("submit", ".folder-form", function() {
             $.ajax({
                 type: "POST",
                 url: $(this).attr('action'),
@@ -85,7 +85,7 @@
 
         $(".file-toolbar").on("submit", "#upload-file-form", function() {
             var formData = new FormData(document.getElementById("upload-file-form"));
-            $('.file-toolbar .wrap-progress').removeClass('hide');
+            $('.file-toolbar .wrap-progress').html('<div class=\"progress progress-striped active\"><div class=\"progress-bar\" style=\"width: 0%\"></div></div>');
             $.ajax({
                 xhr: function() {
                     var xhr = new window.XMLHttpRequest();
@@ -103,6 +103,7 @@
                 },
                 type: "POST",
                 url: $(this).attr('action'),
+                cache: false,
                 processData: false,
                 contentType: false,
                 data: formData,
@@ -170,5 +171,81 @@
             });
             return false;
         });
+
+        $(".main-content").on("click", ".delete-file", function() {
+            $(this).parent().parent().parent().parent().modal('hide');
+            var delete_btn = $(this);
+            bootbox.confirm("Are you sure?", function(result) {
+                if (result) {
+                    $.get(delete_btn.attr('href'), function() {
+                        bootbox.alert('Delete file successfully!');
+                        $('.main-content').html('<center><img src="http://localhost/filemanager/assets/images/loading.gif" alt="loading" /></center>');
+                        var params = 'id=' + $("#upload-file-form").find('input[name="folder_id"]').val();
+                        var data_toke_name = $('.main-content').attr('data-token-name');
+                        var data_toke_value = $('.main-content').attr('data-token-value');
+                        params += '&' + data_toke_name + '=' + data_toke_value;
+                        $.post('filemanager/get_list_file', params, function(data) {
+                            $('.main-content').html(data);
+                        });
+                    });
+                } else {
+                    delete_btn.parent().parent().parent().parent().modal('show');
+                    console.log(0);
+                }
+            });
+            return false;
+        });
+
+        $(".main-content").on("click", ".trash-file", function() {
+            $(this).parent().parent().parent().parent().modal('hide');
+            var trash_btn = $(this);
+            bootbox.confirm("Are you sure?", function(result) {
+                if (result) {
+                    $.get(trash_btn.attr('href'), function() {
+                        bootbox.alert('File has been moved to the trash.');
+                        $('.main-content').html('<center><img src="http://localhost/filemanager/assets/images/loading.gif" alt="loading" /></center>');
+                        var params = 'id=' + $("#upload-file-form").find('input[name="folder_id"]').val();
+                        var data_toke_name = $('.main-content').attr('data-token-name');
+                        var data_toke_value = $('.main-content').attr('data-token-value');
+                        params += '&' + data_toke_name + '=' + data_toke_value;
+                        $.post('filemanager/get_list_file', params, function(data) {
+                            $('.main-content').html(data);
+                        });
+                    });
+                } else {
+                    trash_btn.parent().parent().parent().parent().modal('show');
+                    console.log(0);
+                }
+            });
+            return false;
+        });
+
+        $(".main-content").on("click", ".table a", function() {
+            var data_toke_name = $('.main-content').attr('data-token-name');
+            var data_toke_value = $('.main-content').attr('data-token-value');
+            var link = $(this);
+            link.next().modal('show');
+            $.fn.editable.defaults.mode = 'inline';
+            $.fn.editable.defaults.send = "always";
+            $('.file_name').editable({
+                params: function(params) {
+                    params.csrf_test_name = data_toke_value;
+                    return params;
+                },
+                success: function() {
+                    $('.modal-backdrop').remove();
+                    link.next().modal('hide');
+                    $('.main-content').html('<center><img src="http://localhost/filemanager/assets/images/loading.gif" alt="loading" /></center>');
+                    var params = 'id=' + $("#upload-file-form").find('input[name="folder_id"]').val();
+                    params += '&' + data_toke_name + '=' + data_toke_value;
+                    $.post('filemanager/get_list_file', params, function(data) {
+                        $('.main-content').html(data);
+                    });
+                }
+            });
+            return false;
+        });
+
+
     });
 })(window.jQuery);

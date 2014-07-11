@@ -10,7 +10,7 @@
         <button id="trash" class="btn btn-default btn-sm hide" data-id="0">Trash</button>
         <button id="delete-folder" class="btn btn-danger btn-sm hide" data-id="0">Delete folder</button>
 
-        <div class="modal fade" id="create-folder-modal" role="dialog" aria-hidden="true">
+        <div class="modal fade folder-modal" id="create-folder-modal" role="dialog" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <?php echo form_open("filemanager/create_folder", "data-parsley-validate method='post' id='create-folder-form' class='folder-form'"); ?>
@@ -35,7 +35,7 @@
             </div>
         </div>
 
-        <div class="modal fade" id="rename-folder-modal" role="dialog" aria-hidden="true">
+        <div class="modal fade folder-modal" id="rename-folder-modal" role="dialog" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <?php echo form_open("filemanager/rename_folder", "data-parsley-validate method='post' id='rename-folder-form' class='folder-form'"); ?>
@@ -68,10 +68,7 @@
             <button class="btn btn-success btn-sm">Upload</button>
             <?php echo form_close(); ?>
             <br />
-            <div class="wrap-progress hide">
-                <div class="progress progress-striped active">
-                    <div class="progress-bar" style="width: 0%"></div>
-                </div> 
+            <div class="wrap-progress"> 
             </div>
         </div>
 

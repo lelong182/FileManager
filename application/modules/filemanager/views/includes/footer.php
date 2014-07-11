@@ -8,6 +8,7 @@
 <script type="text/javascript" src="<?= base_url() ?>assets/js/libs/bootstrap.min.js"></script>
 <script type="text/javascript" src="<?= base_url() ?>assets/js/libs/parsley.min.js"></script>
 <script type="text/javascript" src="<?= base_url() ?>assets/js/libs/bootbox.min.js"></script>
+<script type="text/javascript" src="<?= base_url() ?>assets/js/libs/bootstrap-editable.min.js"></script>
 <script src="<?= base_url() ?>assets/js/functions.js"></script>
 </body>
 </html>

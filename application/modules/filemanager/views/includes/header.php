@@ -20,6 +20,7 @@
         <link rel="shortcut icon" href="<?= base_url() ?>assets/images/favicon.ico" />
 
         <link href="<?= base_url() ?>assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+        <link href="<?= base_url() ?>assets/css/bootstrap-editable.css" rel="stylesheet" type="text/css" />
         <link href="<?= base_url() ?>assets/css/style.css" rel="stylesheet" type="text/css" />
 
         <script src="<?= base_url() ?>assets/js/libs/prefixfree.min.js"></script>
@@ -35,7 +36,7 @@
     <body>
         <header>
             <a href="<?= site_url('filemanager') ?>" class="btn <?= ($current_nav == 'local') ? 'btn-primary' : 'btn-info' ?> btn-sm">Local</a>
-            <a href="<?= site_url('filemanager/drive') ?>" class="btn <?= ($current_nav == 'drive') ? 'btn-primary' : 'btn-info' ?> btn-sm">Google Drive</a>
             <a href="<?= site_url('filemanager/list_trash') ?>" class="btn <?= ($current_nav == 'list_trash') ? 'btn-primary' : 'btn-info' ?> btn-sm">List trash</a>
+            <a href="<?= site_url('filemanager/drive') ?>" class="btn <?= ($current_nav == 'drive') ? 'btn-primary' : 'btn-info' ?> btn-sm">Google Drive</a>
         </header>
         <section id="main" class="clearfix">
